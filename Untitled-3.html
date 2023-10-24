@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Competencia Arcade Argentina</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <style>
+        body {
+            background-color: black;
+            color: #00ff00; /* Color verde fluorescente */
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            margin: 0 auto;
+            max-width: 600px;
+            z-index: 1;
+        }
+
+        .title, .subtitle, .league {
+            color: #00ff00; /* Color verde fluorescente */
+        }
+
+        .table-container {
+            margin-top: 20px;
+        }
+
+        .ranking-table {
+            width: 100%;
+            color: #00ff00; /* Color verde fluorescente */
+        }
+
+        .ranking-table th, .ranking-table td {
+            border: 1px solid #00ff00;
+            padding: 10px;
+        }
+
+        .ranking-table tr:nth-child(even) {
+            background-color: #003300; /* Color verde oscuro */
+        }
+
+        .ranking-table tr:hover {
+            background-color: #004400; /* Color verde más claro al pasar el cursor */
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #00ff00;
+            animation: moveStars linear infinite;
+        }
+
+        @keyframes moveStars {
+            from {
+                transform: translate(0, 0);
+            }
+            to {
+                transform: translate(100vw, 100vh);
+            }
+        }
+
+        footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            color: #00ff00; /* Color verde fluorescente */
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            const numStars = 100;
+            const $stars = $('.stars');
+
+            for (let i = 0; i < numStars; i++) {
+                const size = Math.random() * 2 + 1;
+                const xPos = Math.random() * 100;
+                const height = Math.random() * 100;
+                const duration = Math.random() * 10 + 5;
+                const delay = Math.random() * 5;
+                const fadeInTime = Math.random() * 2 + 1;
+
+                $stars.append('<div class="star" style="width:' + size + 'px; height:' + size + 'px; top:' + height + '%; left:' + xPos + '%; opacity: 0;"></div>');
+
+                $('.star').eq(i).animate({
+                    opacity: 1
+                }, fadeInTime * 1000);
+
+                $('.star').eq(i).css('animation-duration', duration + 's');
+                $('.star').eq(i).css('animation-delay', delay + 's');
+            }
+
+            document.getElementById('import-btn').addEventListener('change', handleFile, false);
+
+            function handleFile(e) {
+                var files = e.target.files;
+                var i, f;
+                for (i = 0, f = files[i]; i != files.length; ++i) {
+                    var reader = new FileReader();
+                    var name = f.name;
+                    reader.onload = function (e) {
+                        var data = new Uint8Array(e.target.result);
+                        var workbook = XLSX.read(data, { type: 'array' });
+                        var firstSheet = workbook.SheetNames[0];
+                        var excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+                        var table = document.getElementById('ranking-table');
+                        for (var j = 0; j < excelRows.length; j++) {
+                            var row = table.insertRow(-1);
+                            var cell1 = row.insertCell(0);
+                            var cell2 = row.insertCell(1);
+                            var cell3 = row.insertCell(2);
+                            cell1.innerHTML = excelRows[j].Posicion;
+                            cell2.innerHTML = excelRows[j].Iniciales;
+                            cell3.innerHTML = excelRows[j].Puntuacion;
+                        }
+                    };
+                    reader.readAsArrayBuffer(f);
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="container">
+        <h1 class="title">Scores Arcade Games</h1>
+        <p class="league">Liga Amigo de los Fichines</p>
+        <h2 class="subtitle">Top 10</h2>
+
+        <div class="table-container">
+            <table id="ranking-table" class="ranking-table">
+                <tr>
+                    <th>Posición</th>
+                    <th>Iniciales</th>
+                    <th>Puntuación</th>
+                </tr>
+                <!-- Las filas se agregarán aquí después de la importación -->
+            </table>
+        </div>
+
+        <input type="file" id="import-btn" name="file" />
+    </div>
+
+    <footer>
+        <p>Desarrollado por: Dofus Ark. Todos los derechos reservados ©<script>document.write(new Date().getFullYear())</script></p>
+    </footer>
+
+    <!-- Reproducir música de fondo en formato MP3 -->
+    <audio autoplay loop>
+        <source src="Hang_on.mp3" type="audio/mpeg">
+        Tu navegador no soporta la etiqueta de audio.
+    </audio>
+</body>
+</html>
