@@ -22,6 +22,7 @@
 
     .title {
         font-size: 24px;
+        margin-top: 40px;
     }
 
     .subtitle {
@@ -89,6 +90,11 @@
         bottom: 0;
         width: 100%;
     }
+
+    #countdown {
+        font-size: 24px;
+        margin-top: 10px;
+    }
 </style>
 <script>
     $(document).ready(function () {
@@ -127,13 +133,38 @@
             $('.star').eq(i).css('animation-duration', duration + 's');
             $('.star').eq(i).css('animation-delay', delay + 's');
         }
+
+        // Calcula la diferencia de tiempo hasta el próximo domingo a las 00:00
+        const countDownDate = new Date();
+        countDownDate.setDate(countDownDate.getDate() + (6 + 7 - countDownDate.getDay()) % 7);
+        countDownDate.setHours(0, 0, 0, 0);
+
+        // Actualiza el contador cada segundo
+        const countdownElement = document.getElementById("countdown");
+        const x = setInterval(function () {
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdownElement.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+
+            if (distance < 0) {
+                clearInterval(x);
+                countdownElement.innerHTML = "EXPIRED";
+            }
+        }, 1000);
     });
 </script>
 </head>
 <body>
 <div class="stars"></div>
 <div class="container">
-    <h1 class="title">Scores Arcade Games</h1>
+    <div id="countdown"></div>
+    <h1 class="title">Competencia Arcade Argentina</h1>
     <p class="league">Liga Amigo de los Fichines</p>
     <h1 class="subtitle">Galaga 88</h1>
     <h2 class="subtitle">Top 10</h2>
